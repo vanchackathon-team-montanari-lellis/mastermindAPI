@@ -19,7 +19,11 @@ public class GameRepository {
 
 	public Game save(Game game) {
 		mongoOperations.save(game);
-		game.getGameKey();
+		return game;
+	}
+	
+	public Game findByGameKey(String gameKey) {
+		Game game = mongoOperations.findById(gameKey, Game.class);
 		return game;
 	}
 

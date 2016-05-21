@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.vanhackathon.domain.Colors;
 import com.vanhackathon.domain.Game;
 import com.vanhackathon.domain.Guess;
+import com.vanhackathon.domain.GuessFeedback;
 import com.vanhackathon.domain.User;
 import com.vanhackathon.exceptions.UserNotFoundException;
 import com.vanhackathon.repository.GameRepository;
@@ -46,9 +47,21 @@ public class GameController {
 	}
 
 	@RequestMapping(value = "/guess", method = RequestMethod.POST)
-	public ResponseEntity<Void> create(@RequestBody Guess guess) {
+	public ResponseEntity<GuessFeedback> create(@RequestBody Guess guess) {
+		
+		String gameKey = guess.getGameKey();
+		Game game = gameService.findByGameKey(gameKey);
+		
+		User hostUser;
+		try {
+			hostUser = userService.findByUsername(game.getHostUser().getUsername());
+		} catch (UserNotFoundException e) {
+			throw new RuntimeException(e);
+		}
 
-		return ResponseEntity.status(HttpStatus.CREATED).build();
+		GuessFeedback feed = new GuessFeedback();
+		
+		return ResponseEntity.status(HttpStatus.CREATED).body(feed);
 	}
 	
 	@RequestMapping(value = "/createGame", method = RequestMethod.POST)
