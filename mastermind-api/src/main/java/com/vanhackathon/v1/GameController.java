@@ -17,6 +17,7 @@ import com.vanhackathon.exceptions.UserNotFoundException;
 import com.vanhackathon.mastermind.dto.Colors;
 import com.vanhackathon.mastermind.dto.Game;
 import com.vanhackathon.mastermind.dto.Guess;
+import com.vanhackathon.mastermind.dto.GuessFeedback;
 import com.vanhackathon.mastermind.dto.User;
 import com.vanhackathon.repository.GameRepository;
 import com.vanhackathon.repository.UsersRepository;
@@ -46,9 +47,21 @@ public class GameController {
 	}
 
 	@RequestMapping(value = "/guess", method = RequestMethod.POST)
-	public ResponseEntity<Void> create(@RequestBody Guess guess) {
+	public ResponseEntity<GuessFeedback> create(@RequestBody Guess guess) {
+		
+		String gameKey = guess.getGameKey();
+		Game game = gameService.findByGameKey(gameKey);
+		
+		User hostUser;
+		try {
+			hostUser = userService.findByUsername(game.getHostUser().getUsername());
+		} catch (UserNotFoundException e) {
+			throw new RuntimeException(e);
+		}
 
-		return ResponseEntity.status(HttpStatus.CREATED).build();
+		GuessFeedback feed = new GuessFeedback();
+		
+		return ResponseEntity.status(HttpStatus.CREATED).body(feed);
 	}
 	
 	@RequestMapping(value = "/createGame", method = RequestMethod.POST)
