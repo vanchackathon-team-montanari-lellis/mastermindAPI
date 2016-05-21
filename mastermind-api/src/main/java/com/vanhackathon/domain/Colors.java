@@ -1,12 +1,22 @@
 package com.vanhackathon.domain;
 
+/**
+ * All colors possible.
+ * 
+ * @author lmontanari (lucas_montanari@hotmail.com)
+ */
 public enum Colors {
 
 	RED("red"), BLUE("blue"), GREEN("green"), YELLOW("yellow");
+
+	private String color;
 
 	Colors(String color) {
 		this.color = color;
 	}
 
-	private String color;
+	public String getColor() {
+		return color;
+	}
+
 }

@@ -1,8 +1,11 @@
 package com.vanhackathon.v1;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -11,12 +14,27 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.vanhackathon.domain.Colors;
+import com.vanhackathon.domain.Game;
 import com.vanhackathon.domain.Guess;
 import com.vanhackathon.domain.User;
+import com.vanhackathon.exceptions.UserNotFoundException;
+import com.vanhackathon.repository.GameRepository;
+import com.vanhackathon.repository.UsersRepository;
 
+/**
+ * Rest services to play games.
+ * 
+ * @author lmontanari (lucas_montanari@hotmail.com)
+ */
 @RestController
 @RequestMapping("/v1")
 public class GameController {
+	
+	@Autowired
+	private UsersRepository userService;
+	
+	@Autowired
+	private GameRepository gameService;
 
 	@RequestMapping(value = "/colors", method = RequestMethod.GET)
 	public ResponseEntity<List<Colors>> create() {
@@ -34,8 +52,32 @@ public class GameController {
 	}
 	
 	@RequestMapping(value = "/createGame", method = RequestMethod.POST)
-	public ResponseEntity<Void> createGame(@RequestBody User user) {
+	public ResponseEntity<Game> createGame(@RequestBody String usernameHost) {
+		// , @RequestBody boolean singlePlayer
+		
+		User hostUser;
+		try {
+			hostUser = userService.findByUsername(usernameHost);
+		} catch (UserNotFoundException e) {
+			throw new RuntimeException(e);
+		}
+		
+		Game game = new Game();
+		game.setHostUser(hostUser);
+		game.setCreationDate(new Date());
+		game.setSinglePlayer(true);
 
-		return ResponseEntity.status(HttpStatus.CREATED).build();
+		// Creating secret for this game.
+		List<Colors> colors = new ArrayList<Colors>();
+		colors.add(Colors.BLUE);
+		colors.add(Colors.GREEN);
+		colors.add(Colors.RED);
+		colors.add(Colors.YELLOW);
+		
+		game.setSecret(colors);
+		
+		game = gameService.save(game);
+
+		return ResponseEntity.status(HttpStatus.CREATED).body(game);
 	}
 }

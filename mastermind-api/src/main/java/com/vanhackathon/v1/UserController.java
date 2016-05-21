@@ -9,14 +9,19 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.vanhackathon.domain.User;
-import com.vanhackathon.service.UserService;
+import com.vanhackathon.repository.UsersRepository;
 
+/**
+ * Rest services to manage users.
+ * 
+ * @author lmontanari (lucas_montanari@hotmail.com)
+ */
 @RestController
 @RequestMapping("/v1")
 public class UserController {
 
 	@Autowired
-	private UserService userService;
+	private UsersRepository userService;
 
 	@RequestMapping(value = "/user", method = RequestMethod.POST)
 	public ResponseEntity<Void> create(@RequestBody User user) {
