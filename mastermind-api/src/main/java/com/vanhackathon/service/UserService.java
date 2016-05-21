@@ -6,7 +6,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
-import com.vanhackathon.domain.User;
+import com.vanhackathon.dto.User;
 
 @Service
 public class UserService {

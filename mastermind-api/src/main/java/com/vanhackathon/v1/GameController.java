@@ -10,9 +10,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.vanhackathon.domain.Colors;
-import com.vanhackathon.domain.Guess;
-import com.vanhackathon.domain.User;
+import com.vanhackathon.dto.Colors;
+import com.vanhackathon.dto.GuessDTO;
+import com.vanhackathon.dto.User;
 
 @RestController
 @RequestMapping("/v1")
@@ -28,7 +28,7 @@ public class GameController {
 	}
 
 	@RequestMapping(value = "/guess", method = RequestMethod.POST)
-	public ResponseEntity<Void> create(@RequestBody Guess guess) {
+	public ResponseEntity<Void> create(@RequestBody GuessDTO guess) {
 
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
