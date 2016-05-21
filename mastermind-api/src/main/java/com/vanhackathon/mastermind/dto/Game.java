@@ -1,4 +1,4 @@
-package com.vanhackathon.domain;
+package com.vanhackathon.mastermind.dto;
 
 import java.util.Date;
 import java.util.List;
