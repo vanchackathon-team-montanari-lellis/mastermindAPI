@@ -13,12 +13,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.vanhackathon.domain.Colors;
-import com.vanhackathon.domain.Game;
-import com.vanhackathon.domain.Guess;
-import com.vanhackathon.domain.GuessFeedback;
-import com.vanhackathon.domain.User;
 import com.vanhackathon.exceptions.UserNotFoundException;
+import com.vanhackathon.mastermind.dto.Colors;
+import com.vanhackathon.mastermind.dto.Game;
+import com.vanhackathon.mastermind.dto.Guess;
+import com.vanhackathon.mastermind.dto.GuessFeedback;
+import com.vanhackathon.mastermind.dto.User;
 import com.vanhackathon.repository.GameRepository;
 import com.vanhackathon.repository.UsersRepository;
 
