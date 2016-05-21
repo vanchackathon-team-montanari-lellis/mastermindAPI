@@ -6,8 +6,8 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
-import com.vanhackathon.domain.User;
 import com.vanhackathon.exceptions.UserNotFoundException;
+import com.vanhackathon.mastermind.dto.User;
 
 /**
  * Controls access data to Users.

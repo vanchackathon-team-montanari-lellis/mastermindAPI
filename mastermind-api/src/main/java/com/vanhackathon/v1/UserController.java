@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.vanhackathon.domain.User;
+import com.vanhackathon.mastermind.dto.User;
 import com.vanhackathon.repository.UsersRepository;
 
 /**
