@@ -67,10 +67,6 @@
 			<artifactId>spring-data-mongodb</artifactId>
 		</dependency>
 
-		<dependency>
-			<groupId>com.goldmansachs</groupId>
-			<artifactId>gs-collections</artifactId>
-			<version>5.1.0</version>
-		</dependency>
+
 	</dependencies>
 </project>
