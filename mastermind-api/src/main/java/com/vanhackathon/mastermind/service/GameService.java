@@ -15,6 +15,7 @@ import com.vanhackathon.mastermind.domain.GameStatus;
 import com.vanhackathon.mastermind.domain.Guess;
 import com.vanhackathon.mastermind.domain.User;
 import com.vanhackathon.mastermind.exception.InvalidColorException;
+import com.vanhackathon.mastermind.exception.NotYourTurnException;
 import com.vanhackathon.mastermind.exception.UserNotFoundException;
 import com.vanhackathon.mastermind.repository.GameRepository;
 import com.vanhackathon.mastermind.repository.UsersRepository;
@@ -37,13 +38,20 @@ public class GameService {
 		this.users = users;
 	}
 
-	public GameDTO guess(GuessDTO guess) {
+	public GameDTO guess(GuessDTO guess) throws NotYourTurnException {
 		guessSanityCheck(guess);
 
 		Game game = games.findByGameKey(guess.getGameKey());
 		game = game.guess(guess.getColors(), guess.getPlayer());
 		game = games.save(game);
 		return transformIntoGameDTO(game);
+	}
+	
+	public GameDTO findByGameKey(String gameKey) {
+		Game game = games.findByGameKey(gameKey);
+
+		GameDTO gameDTO = transformIntoGameDTO(game);
+		return gameDTO;
 	}
 
 	private void guessSanityCheck(GuessDTO guess) {
@@ -59,9 +67,9 @@ public class GameService {
 			throw new IllegalArgumentException("Colors can not be null.");
 		}
 
-		// if (guess.getColors().length() != 8) {
-		// throw new IllegalArgumentException("Colors length must be 8.");
-		// }
+		if (guess.getColors().length() != 8) {
+		    throw new IllegalArgumentException("Colors length must be 8.");
+		}
 
 		char[] colors = guess.getColors().toCharArray();
 		for (char c : colors) {
@@ -73,16 +81,19 @@ public class GameService {
 
 	}
 	
-	private GameDTO transformIntoGameDTO(Game game, String externalUser) {
+	private GameDTO transformIntoGameDTO(Game game) {
 		GameDTO gameDTO = transformIntoGameDTOBase(game);
-		gameDTO.setCompleteGuesses(getGameGuessesOfUser(game, externalUser));
+		gameDTO.setCompleteGuesses(getGameGuesses(game));
 
 		return gameDTO;
 	}
 
-	private GameDTO transformIntoGameDTO(Game game) {
+	private GameDTO transformIntoGameDTOShowGameStatus(Game game) {
 		GameDTO gameDTO = transformIntoGameDTOBase(game);
-		gameDTO.setCompleteGuesses(getGameGuesses(game));
+		
+		if (game.isCompleted() || game.isSinglePlayer()) {
+			gameDTO.setCompleteGuesses(getGameGuesses(game));
+		}
 
 		return gameDTO;
 	}
@@ -119,15 +130,6 @@ public class GameService {
 				.collect(Collectors.toList());
 	}
 	
-	private List<Guess> getGameGuessesOfUser(Game game, String externalUser) {
-		if (game.isCompleted() || game.isSinglePlayer()) {
-			return game.getGuesses();
-		}
-
-		return game.getGuesses().stream().filter(g -> g.getPlayer().equals(externalUser))
-				.collect(Collectors.toList());
-	}
-
 	public GameDTO newSinglePlayer(String username) {
 		Game game = newSinglePlayerGame(username);
 		games.save(game);
@@ -149,15 +151,14 @@ public class GameService {
 		return transformIntoGameDTO(game);
 	}
 
-	public GameDTO showGameStatus(String gameKey, String externalUser) {
-		newGameSanityCheck(externalUser);
+	public GameDTO showGameStatus(String gameKey) {
 		gameKeySanityCheck(gameKey);
 
 		Game game = games.findByGameKey(gameKey);
 
-		// If its not solved yet, show only guesses from externalUser.
-		GameDTO gameDTO = transformIntoGameDTO(game, externalUser);
-
+		// If its not completed yet dont show guesses.
+		GameDTO gameDTO = transformIntoGameDTOShowGameStatus(game);
+		
 		return gameDTO;
 	}
 
