@@ -1,8 +1,6 @@
 package com.vanhackathon.v1;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,11 +12,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.vanhackathon.exceptions.UserNotFoundException;
-import com.vanhackathon.mastermind.dto.Colors;
-import com.vanhackathon.mastermind.dto.Game;
-import com.vanhackathon.mastermind.dto.Guess;
-import com.vanhackathon.mastermind.dto.GuessFeedback;
-import com.vanhackathon.mastermind.dto.User;
+import com.vanhackathon.mastermind.domain.Colors;
+import com.vanhackathon.mastermind.domain.Game;
+import com.vanhackathon.mastermind.domain.User;
+import com.vanhackathon.mastermind.dto.GameDTO;
+import com.vanhackathon.mastermind.dto.GuessDTO;
 import com.vanhackathon.repository.GameRepository;
 import com.vanhackathon.repository.UsersRepository;
 
@@ -38,7 +36,7 @@ public class GameController {
 	private GameRepository gameService;
 
 	@RequestMapping(value = "/colors", method = RequestMethod.GET)
-	public ResponseEntity<List<Colors>> create() {
+	public ResponseEntity<List<Colors>> getAllColors() {
 
 		Colors[] values = Colors.values();
 		List<Colors> asList = Arrays.asList(values);
@@ -47,7 +45,7 @@ public class GameController {
 	}
 
 	@RequestMapping(value = "/guess", method = RequestMethod.POST)
-	public ResponseEntity<GuessFeedback> create(@RequestBody Guess guess) {
+	public ResponseEntity<GuessDTO> guess(@RequestBody GuessDTO guess) {
 		
 		String gameKey = guess.getGameKey();
 		Game game = gameService.findByGameKey(gameKey);
@@ -58,39 +56,36 @@ public class GameController {
 		} catch (UserNotFoundException e) {
 			throw new RuntimeException(e);
 		}
-
-		GuessFeedback feed = new GuessFeedback();
 		
-		return ResponseEntity.status(HttpStatus.CREATED).body(feed);
+		// Domain class
+		Game domainGame = new Game();
+
+		return ResponseEntity.status(HttpStatus.CREATED).body(guess);
 	}
 	
 	@RequestMapping(value = "/createGame", method = RequestMethod.POST)
-	public ResponseEntity<Game> createGame(@RequestBody String usernameHost) {
-		// , @RequestBody boolean singlePlayer
+	public ResponseEntity<GameDTO> createGame(@RequestBody String hostUsername) {
 		
 		User hostUser;
 		try {
-			hostUser = userService.findByUsername(usernameHost);
+			hostUser = userService.findByUsername(hostUsername);
 		} catch (UserNotFoundException e) {
 			throw new RuntimeException(e);
 		}
 		
-		Game game = new Game();
-		game.setHostUser(hostUser);
-		game.setCreationDate(new Date());
-		game.setSinglePlayer(true);
-
-		// Creating secret for this game.
-		List<Colors> colors = new ArrayList<Colors>();
-		colors.add(Colors.BLUE);
-		colors.add(Colors.GREEN);
-		colors.add(Colors.RED);
-		colors.add(Colors.YELLOW);
+		// Domain class to create secret.
+		Game domainGame = new Game();
+		domainGame.setHostUser(hostUser);
+		domainGame.setSinglePlayer(true);
 		
-		game.setSecret(colors);
+		domainGame = gameService.save(domainGame);
 		
-		game = gameService.save(game);
-
-		return ResponseEntity.status(HttpStatus.CREATED).body(game);
+		GameDTO gameDTO = new GameDTO();
+		gameDTO.setGameKey(domainGame.getGameKey());
+		gameDTO.setHostUser(domainGame.getHostUser());
+		gameDTO.setSinglePlayer(domainGame.isSinglePlayer());
+		gameDTO.setSecret(Colors.tranformString(domainGame.getSecret()));
+		
+		return ResponseEntity.status(HttpStatus.CREATED).body(gameDTO);
 	}
 }

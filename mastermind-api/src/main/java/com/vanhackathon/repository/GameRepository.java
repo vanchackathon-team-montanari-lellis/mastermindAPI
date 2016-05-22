@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.stereotype.Service;
 
-import com.vanhackathon.mastermind.dto.Game;
+import com.vanhackathon.mastermind.domain.Game;
 
 /**
  * Controls access data to Game.
