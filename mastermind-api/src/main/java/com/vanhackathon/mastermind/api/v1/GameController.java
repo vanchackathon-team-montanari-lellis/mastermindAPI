@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -19,8 +20,10 @@ import com.vanhackathon.mastermind.api.dto.GameDTO;
 import com.vanhackathon.mastermind.api.dto.GuessDTO;
 import com.vanhackathon.mastermind.domain.Colors;
 import com.vanhackathon.mastermind.exception.GameNotFoundException;
+import com.vanhackathon.mastermind.exception.InvalidColorException;
 import com.vanhackathon.mastermind.exception.NotYourTurnException;
 import com.vanhackathon.mastermind.service.GameService;
+import com.wordnik.swagger.annotations.ApiParam;
 
 /**
  * Rest services to play games.
@@ -50,14 +53,26 @@ public class GameController {
 		return ResponseEntity.status(HttpStatus.OK).body(game);
 	}
 
-	@RequestMapping(value = "/createGame", method = RequestMethod.POST)
-	public ResponseEntity<GameDTO> createGame(@RequestBody(required = true) String username) {
+	@RequestMapping(value = "/game", method = RequestMethod.POST)
+	public ResponseEntity<GameDTO> createNewGame(@RequestBody(required = true) String username) {
 		GameDTO gameDTO = gameService.newGame(username);
 		return ResponseEntity.status(HttpStatus.CREATED).body(gameDTO);
+	}
+	
+	@RequestMapping(value = "/game/{gameKey}", method = RequestMethod.GET)
+	public ResponseEntity<GameDTO> showGameStatus(
+			@ApiParam(name = "gameKey", value = "Gamekey of the game.", required = true) @PathVariable("gameKey") String gameKey) {
+		GameDTO gameDTO = gameService.showGameStatus(gameKey);
+		return ResponseEntity.status(HttpStatus.OK).body(gameDTO);
 	}
 
 	@ExceptionHandler(IllegalArgumentException.class)
 	public void handleIllegalArguments(HttpServletResponse response, Exception e) throws IOException {
+		response.sendError(HttpStatus.BAD_REQUEST.value(), e.getMessage());
+	}
+	
+	@ExceptionHandler(InvalidColorException.class)
+	public void handleInvalidColorException(HttpServletResponse response, Exception e) throws IOException {
 		response.sendError(HttpStatus.BAD_REQUEST.value(), e.getMessage());
 	}
 

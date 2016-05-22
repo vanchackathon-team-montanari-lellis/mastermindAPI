@@ -29,5 +29,23 @@ public enum Colors {
 		}
 		return v;
 	}
+	
+	/**
+	 * Get color using its first letter.
+	 * 
+	 * @param c
+	 *            Char as First letter.
+	 * @return Colors. Null when not found.
+	 */
+	public static Colors getColorByChar(char c) {
+		Colors[] values = values();
+		for (int i = 0; i < values.length; i++) {
+			Colors currentColor = values[i];
+			if (String.valueOf(c).equals(currentColor.getColor())) {
+				return currentColor;
+			}
+		}
+		return null;
+	}
 
 }
