@@ -18,15 +18,19 @@ import com.vanhackathon.mastermind.exception.GameNotFoundException;
 @Repository
 public class GameRepository {
 
-	@Autowired
 	private MongoOperations mongoOperations;
 
+	@Autowired
+	public GameRepository(MongoOperations mongoOperations) {
+		this.mongoOperations = mongoOperations;
+	}
+	
 	public Game save(Game game) {
 		mongoOperations.save(game);
 		return game;
 	}
 
-	public Game findByGameKey(String gameKey) {
+	public Game findByGameKey(String gameKey) throws GameNotFoundException {
 		Game game = mongoOperations.findById(gameKey, Game.class);
 		if (game != null) {
 			return game;

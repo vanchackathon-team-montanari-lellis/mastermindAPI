@@ -11,11 +11,12 @@ public class Guess {
 	private int nearPens;
 	private String player;
 
-	private GameStatus status = GameStatus.PLAYING;
+	private GameStatus status;
 
 	public Guess(String answer, String player) {
 		this.answer = answer.toUpperCase();
 		this.player = player;
+		this.status = GameStatus.PLAYING;
 	}
 
 	private int findExactPens(String secret) {
