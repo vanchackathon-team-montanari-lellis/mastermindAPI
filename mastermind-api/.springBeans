@@ -7,7 +7,6 @@
 	</configSuffixes>
 	<enableImports><![CDATA[false]]></enableImports>
 	<configs>
-		<config>java:com.vanhackathon.main.Boot</config>
 	</configs>
 	<autoconfigs>
 	</autoconfigs>
