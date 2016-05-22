@@ -16,8 +16,7 @@ import com.vanhackathon.mastermind.exception.NotYourTurnException;
 @Document(collection = "games")
 public class Game {
 
-	private static final int TIME_WINDOW = 30 * 60 * 1000;
-	private static final String COLORS = Colors.getColorValues();
+	private static final int TIME_WINDOW_IN_MS = 30 * 60 * 1000;
 
 	@Id
 	private String gameKey;
@@ -41,7 +40,7 @@ public class Game {
 
 	private String generateSecretCode() {
 		Random random = new Random();
-		String code = COLORS;
+		String code = Colors.getColorValues();
 		// randomly choose a color sequence. repeated colors are allowed.
 		return code.chars().mapToObj(c -> String.valueOf(code.charAt(random.nextInt(code.length()))))
 				.collect(Collectors.joining());
@@ -72,10 +71,7 @@ public class Game {
 			nextTurn = new User(player);
 		} else if (!nextTurn.equals(new User(player))) {
 			throw new NotYourTurnException("It is not your turn! Please wait.");
-			
 		}
-
-		
 	}
 
 	private void checkTimeLimit() {
@@ -83,7 +79,7 @@ public class Game {
 			return;
 		}
 
-		if (System.currentTimeMillis() - TIME_WINDOW > startTime) {
+		if (System.currentTimeMillis() - TIME_WINDOW_IN_MS > startTime) {
 			this.status = GameStatus.TIME_IS_OVER;
 		}
 	}
