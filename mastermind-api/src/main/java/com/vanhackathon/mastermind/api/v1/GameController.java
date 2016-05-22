@@ -14,17 +14,18 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.vanhackathon.mastermind.api.dto.GameDTO;
 import com.vanhackathon.mastermind.api.dto.GuessDTO;
 import com.vanhackathon.mastermind.api.dto.NewGameDTO;
 import com.vanhackathon.mastermind.domain.Colors;
+import com.vanhackathon.mastermind.domain.User;
 import com.vanhackathon.mastermind.exception.GameNotFoundException;
 import com.vanhackathon.mastermind.exception.InvalidColorException;
 import com.vanhackathon.mastermind.exception.NotYourTurnException;
 import com.vanhackathon.mastermind.service.GameService;
-import com.wordnik.swagger.annotations.ApiParam;
 
 /**
  * Rest services to play games.
@@ -66,9 +67,8 @@ public class GameController {
 	}
 
 	@RequestMapping(value = "/game/{gameKey}", method = RequestMethod.GET)
-	public ResponseEntity<GameDTO> showGameStatus(
-			@ApiParam(name = "gameKey", value = "Gamekey of the game.", required = true) @PathVariable("gameKey") String gameKey) {
-		GameDTO gameDTO = gameService.showGameStatus(gameKey);
+	public ResponseEntity<GameDTO> showGameStatus(@PathVariable("gameKey") String gameKey, @RequestParam(required=true) String username) {
+		GameDTO gameDTO = gameService.showGameStatus(gameKey, username);
 		return ResponseEntity.status(HttpStatus.OK).body(gameDTO);
 	}
 

@@ -7,8 +7,7 @@ package com.vanhackathon.mastermind.domain;
  */
 public enum Colors {
 
-	RED("R"), BLUE("B"), GREEN("G"), YELLOW("Y"); //, PURPLE("P"), ORANGE("O"),
-						// CYAN("C"), MAGENTA("M");
+	RED("R"), BLUE("B"), GREEN("G"), YELLOW("Y"), PURPLE("P"), ORANGE("O"), CYAN("C"), MAGENTA("M");
 
 	private String color;
 
