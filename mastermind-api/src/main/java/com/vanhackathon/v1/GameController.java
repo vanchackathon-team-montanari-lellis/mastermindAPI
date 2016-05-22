@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -47,12 +48,30 @@ public class GameController {
 
 	@RequestMapping(value = "/guess", method = RequestMethod.POST)
 	public ResponseEntity<GameDTO> guess(@RequestBody GuessDTO guess) {
+		if (StringUtils.isEmpty(guess.getUsernameOfGuesser())) {
+			// Username cant be null.
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+		}
+		
+		if (StringUtils.isEmpty(guess.getGameKey())) {
+			// GameKey cant be null.
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+		}
+		
+		if (StringUtils.isEmpty(guess.getColorsGuessed())) {
+			// Colors cant be null.
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+		}
+		
+		if (guess.getColorsGuessed().length() != 8) {
+			// Colors size cant be less than 8.
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+		}
 		
 		String gameKey = guess.getGameKey();
 		Game game = gameService.findByGameKey(gameKey);
 		
-		List<String> colorsGuessed = guess.getColorsGuessed();
-		String secretGuessed = Colors.parseColors(colorsGuessed);
+		String secretGuessed = guess.getColorsGuessed();
 		
 		game = game.guess(secretGuessed);
 		
@@ -70,13 +89,20 @@ public class GameController {
 	}
 	
 	@RequestMapping(value = "/createGame", method = RequestMethod.POST)
-	public ResponseEntity<GameDTO> createGame(@RequestBody String hostUsername) {
-		
+	public ResponseEntity<GameDTO> createGame(@RequestBody(required=true) String hostUsername) {
+		if (StringUtils.isEmpty(hostUsername)) {
+			// Username cant be null.
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+		}
+
 		User hostUser;
 		try {
 			hostUser = userService.findByUsername(hostUsername);
 		} catch (UserNotFoundException e) {
-			throw new RuntimeException(e);
+			// If it doesnt exist, lets create one.
+			hostUser = new User();
+			hostUser.setUsername(hostUsername);
+			userService.save(hostUser);
 		}
 		
 		// Domain class to create secret.
