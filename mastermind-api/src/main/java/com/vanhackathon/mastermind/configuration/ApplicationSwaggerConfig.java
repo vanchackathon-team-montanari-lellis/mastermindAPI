@@ -1,4 +1,4 @@
-package com.vanhackathon.conf;
+package com.vanhackathon.mastermind.configuration;
 
 import org.springframework.context.annotation.Bean;
 

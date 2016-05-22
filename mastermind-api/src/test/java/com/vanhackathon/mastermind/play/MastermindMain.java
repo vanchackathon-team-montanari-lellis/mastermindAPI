@@ -1,4 +1,4 @@
-package com.vanhackathon.mastermind;
+package com.vanhackathon.mastermind.play;
 
 import java.util.Scanner;
 
@@ -20,7 +20,7 @@ public class MastermindMain {
                     System.exit(1);
                 }
 
-                Game guess = game.guess(read);
+                Game guess = game.guess(read, "test");
                 System.out.println(guess.getGuesses().get(guess.getGuesses().size() - 1));
             }
 
