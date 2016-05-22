@@ -21,6 +21,15 @@ public enum Colors {
 	public String getColor() {
 		return color;
 	}
+	
+	public static String parseColors(List<String> colors) {
+		String result = "";
+		for (String string : colors) {
+			result += string;
+		}
+		
+		return result;
+	}
 
 	public static String getColorValues() {
 		Colors[] values = values();

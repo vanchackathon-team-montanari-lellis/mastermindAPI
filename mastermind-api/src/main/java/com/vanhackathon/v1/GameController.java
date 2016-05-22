@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.vanhackathon.exceptions.UserNotFoundException;
 import com.vanhackathon.mastermind.domain.Colors;
 import com.vanhackathon.mastermind.domain.Game;
+import com.vanhackathon.mastermind.domain.GameStatus;
 import com.vanhackathon.mastermind.domain.User;
 import com.vanhackathon.mastermind.dto.GameDTO;
 import com.vanhackathon.mastermind.dto.GuessDTO;
@@ -45,22 +46,27 @@ public class GameController {
 	}
 
 	@RequestMapping(value = "/guess", method = RequestMethod.POST)
-	public ResponseEntity<GuessDTO> guess(@RequestBody GuessDTO guess) {
+	public ResponseEntity<GameDTO> guess(@RequestBody GuessDTO guess) {
 		
 		String gameKey = guess.getGameKey();
 		Game game = gameService.findByGameKey(gameKey);
 		
-		User hostUser;
-		try {
-			hostUser = userService.findByUsername(game.getHostUser().getUsername());
-		} catch (UserNotFoundException e) {
-			throw new RuntimeException(e);
-		}
+		List<String> colorsGuessed = guess.getColorsGuessed();
+		String secretGuessed = Colors.parseColors(colorsGuessed);
 		
-		// Domain class
-		Game domainGame = new Game();
+		game = game.guess(secretGuessed);
+		
+		game = gameService.save(game);
+		
+		// Transform into DTO.
+		GameDTO gameDTO = new GameDTO();
+		gameDTO.setGameKey(game.getGameKey());
+		gameDTO.setHostUser(game.getHostUser());
+		gameDTO.setSinglePlayer(game.isSinglePlayer());
+		gameDTO.setSolved(game.getStatus().equals(GameStatus.SOLVED));
+		gameDTO.setTotalGuesses(game.getTotalGuesses());
 
-		return ResponseEntity.status(HttpStatus.CREATED).body(guess);
+		return ResponseEntity.status(HttpStatus.CREATED).body(gameDTO);
 	}
 	
 	@RequestMapping(value = "/createGame", method = RequestMethod.POST)
@@ -84,7 +90,8 @@ public class GameController {
 		gameDTO.setGameKey(domainGame.getGameKey());
 		gameDTO.setHostUser(domainGame.getHostUser());
 		gameDTO.setSinglePlayer(domainGame.isSinglePlayer());
-		gameDTO.setSecret(Colors.tranformString(domainGame.getSecret()));
+		gameDTO.setSolved(false);
+		gameDTO.setTotalGuesses(0);
 		
 		return ResponseEntity.status(HttpStatus.CREATED).body(gameDTO);
 	}
