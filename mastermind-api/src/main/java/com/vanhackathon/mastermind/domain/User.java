@@ -1,7 +1,5 @@
 package com.vanhackathon.mastermind.domain;
 
-import java.math.BigInteger;
-
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -14,7 +12,7 @@ public class User {
 
 	@ApiModelProperty()
 	@Id
-	private BigInteger id;
+	private String id;
 
 	@ApiModelProperty()
 	private String username;
@@ -23,11 +21,11 @@ public class User {
 		return username;
 	}
 
-	public BigInteger getId() {
+	public String getId() {
 		return id;
 	}
 
-	public void setId(BigInteger id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 

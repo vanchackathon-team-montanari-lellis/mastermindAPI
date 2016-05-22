@@ -1,36 +1,34 @@
 package com.vanhackathon.mastermind.dto;
 
-import java.util.List;
-
 public class GuessDTO {
 
-	private String usernameHost;
+	private String usernameOfGuesser;
 
 	private String gameKey;
 
-	private List<String> colorsGuessed;
+	private String colorsGuessed;
 
 	public String getGameKey() {
 		return gameKey;
 	}
 
-	public String getUsernameHost() {
-		return usernameHost;
+	public String getUsernameOfGuesser() {
+		return usernameOfGuesser;
 	}
 
 	public void setGameKey(String gameKey) {
 		this.gameKey = gameKey;
 	}
 
-	public void setUsernameHost(String usernameHost) {
-		this.usernameHost = usernameHost;
+	public void setUsernameOfGuesser(String usernameOfGuesser) {
+		this.usernameOfGuesser = usernameOfGuesser;
 	}
 
-	public List<String> getColorsGuessed() {
+	public String getColorsGuessed() {
 		return colorsGuessed;
 	}
-
-	public void setColorsGuessed(List<String> colorsGuessed) {
+	
+	public void setColorsGuessed(String colorsGuessed) {
 		this.colorsGuessed = colorsGuessed;
 	}
 
