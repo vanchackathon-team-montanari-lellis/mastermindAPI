@@ -57,7 +57,7 @@ public class GameController {
 		guessSanityCheck(guess);
 
 		Game game = games.findByGameKey(guess.getGameKey());
-		game = game.guess(guess.getColorsGuessed(), guess.getUsernameOfGuesser());
+		game = game.guess(guess.getColors(), guess.getPlayer());
 		game = games.save(game);
 
 		GameDTO gameDTO = transformIntoGameDTO(game);
@@ -67,59 +67,72 @@ public class GameController {
 	private GameDTO transformIntoGameDTO(Game game) {
 		GameDTO gameDTO = new GameDTO();
 		gameDTO.setGameKey(game.getGameKey());
-		gameDTO.setHostUser(game.getHostUser());
+		gameDTO.setHostPlayer(game.getHostPlayer());
+		gameDTO.setSecondPlayer(game.getSecondPlayer());
 		gameDTO.setSinglePlayer(game.isSinglePlayer());
 		gameDTO.setSolved(game.getStatus().equals(GameStatus.SOLVED));
+		gameDTO.setStatus(game.getStatus().toString());
 		gameDTO.setTotalGuesses(game.getTotalGuesses());
+		gameDTO.setCompleteGuesses(game.getGuesses());
 		return gameDTO;
 	}
 
 	private void guessSanityCheck(GuessDTO guess) {
-		if (StringUtils.isEmpty(guess.getUsernameOfGuesser())) {
-			throw new IllegalArgumentException("Username can not be null.");
+		if (StringUtils.isEmpty(guess.getPlayer())) {
+			throw new IllegalArgumentException("Player can not be null.");
 		}
 
 		if (StringUtils.isEmpty(guess.getGameKey())) {
 			throw new IllegalArgumentException("GameKey can not be null.");
 		}
 
-		if (StringUtils.isEmpty(guess.getColorsGuessed())) {
+		if (StringUtils.isEmpty(guess.getColors())) {
 			throw new IllegalArgumentException("Colors can not be null.");
 		}
 
-		if (guess.getColorsGuessed().length() != 8) {
-			throw new IllegalArgumentException("Colors length must be 8.");
-		}
+//		if (guess.getColors().length() != 8) {
+//			throw new IllegalArgumentException("Colors length must be 8.");
+//		}
 	}
 
 	@RequestMapping(value = "/createGame", method = RequestMethod.POST)
-	public ResponseEntity<GameDTO> createGame(@RequestBody(required = true) String hostUsername) {
-		newGameSanityCheck(hostUsername);
+	public ResponseEntity<GameDTO> createGame(@RequestBody(required = true) String username) {
+		newGameSanityCheck(username);
 
-		Game game = new Game();
-		game.setHostUser(findHostUser(hostUsername));
-		game.setSinglePlayer(true);
+		Game game = games.findOneWaiting();
+		if (game == null) {
+			game = newSinglePlayerGame(username);
+		} else {
+			game.play(findOrCreateUser(username));
+		}
 		game = games.save(game);
 
 		GameDTO gameDTO = transformIntoGameDTO(game);
 		return ResponseEntity.status(HttpStatus.CREATED).body(gameDTO);
 	}
 
-	private User findHostUser(String hostUsername) {
+	private Game newSinglePlayerGame(String username) {
+		Game game = new Game();
+		game.setHostPlayer(findOrCreateUser(username));
+		game.setSinglePlayer(true);
+		return game;
+	}
+
+	private User findOrCreateUser(String username) {
 		try {
-			return users.findByUsername(hostUsername);
+			return users.findByUsername(username);
 
 		} catch (UserNotFoundException e) {
 			// If it doesn't exist, lets create one.
-			User hostUser = new User();
-			hostUser.setUsername(hostUsername);
-			users.save(hostUser);
-			return hostUser;
+			User user = new User();
+			user.setUsername(username);
+			users.save(user);
+			return user;
 		}
 	}
 
-	private void newGameSanityCheck(String hostUsername) {
-		if (StringUtils.isEmpty(hostUsername)) {
+	private void newGameSanityCheck(String username) {
+		if (StringUtils.isEmpty(username)) {
 			throw new IllegalArgumentException("Username can not be null.");
 		}
 	}

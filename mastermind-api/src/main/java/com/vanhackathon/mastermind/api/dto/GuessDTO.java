@@ -2,34 +2,32 @@ package com.vanhackathon.mastermind.api.dto;
 
 public class GuessDTO {
 
-	private String usernameOfGuesser;
-
+	private String player;
 	private String gameKey;
+	private String colors;
 
-	private String colorsGuessed;
+	public String getPlayer() {
+		return player;
+	}
+
+	public void setPlayer(String player) {
+		this.player = player;
+	}
 
 	public String getGameKey() {
 		return gameKey;
-	}
-
-	public String getUsernameOfGuesser() {
-		return usernameOfGuesser;
 	}
 
 	public void setGameKey(String gameKey) {
 		this.gameKey = gameKey;
 	}
 
-	public void setUsernameOfGuesser(String usernameOfGuesser) {
-		this.usernameOfGuesser = usernameOfGuesser;
+	public String getColors() {
+		return colors;
 	}
 
-	public String getColorsGuessed() {
-		return colorsGuessed;
-	}
-	
-	public void setColorsGuessed(String colorsGuessed) {
-		this.colorsGuessed = colorsGuessed;
+	public void setColors(String colors) {
+		this.colors = colors;
 	}
 
 }
