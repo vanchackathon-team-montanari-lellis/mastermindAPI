@@ -62,7 +62,7 @@ public class GameService {
 		// if (guess.getColors().length() != 8) {
 		// throw new IllegalArgumentException("Colors length must be 8.");
 		// }
-		
+
 		char[] colors = guess.getColors().toCharArray();
 		for (char c : colors) {
 			Colors color = Colors.getColorByChar(c);
@@ -70,7 +70,7 @@ public class GameService {
 				throw new InvalidColorException(String.format("Color [%s] invalid.", c));
 			}
 		}
-		
+
 	}
 
 	private GameDTO transformIntoGameDTO(Game game) {
@@ -83,7 +83,7 @@ public class GameService {
 		gameDTO.setStatus(game.getStatus().toString());
 		gameDTO.setTotalGuesses(game.getTotalGuesses());
 		gameDTO.setCompleteGuesses(getGameGuesses(game));
-		
+
 		if (gameDTO.isSolved()) {
 			List<Guess> guesses = game.getGuesses();
 			for (Guess guess : guesses) {
@@ -92,13 +92,13 @@ public class GameService {
 				}
 			}
 		}
-		
+
 		return gameDTO;
 	}
 
 	// filter user guesses or return all guesses when the game is completed
 	private List<Guess> getGameGuesses(Game game) {
-		if (game.isCompleted()) {
+		if (game.isCompleted() || game.isSinglePlayer()) {
 			return game.getGuesses();
 		}
 
@@ -106,28 +106,45 @@ public class GameService {
 				.collect(Collectors.toList());
 	}
 
-	public GameDTO newGame(String username) {
+	public GameDTO newSinglePlayer(String username) {
+		Game game = newSinglePlayerGame(username);
+		games.save(game);
+		return transformIntoGameDTO(game);
+	}
+
+	public GameDTO newMultiPlayer(String username) {
 		newGameSanityCheck(username);
 
 		Game game = games.findOneWaiting();
 		if (game == null) {
-			game = newSinglePlayerGame(username);
+			game = newMultiPlayerGame(username);
 
 		} else if (!isPlayingAgainstMyself(username, game)) {
 			game.play(findOrCreateUser(username));
 		}
 
 		game = games.save(game);
-
 		return transformIntoGameDTO(game);
 	}
-	
+
 	public GameDTO showGameStatus(String gameKey) {
 		gameKeySanityCheck(gameKey);
 
 		Game game = games.findByGameKey(gameKey);
 
 		return transformIntoGameDTO(game);
+	}
+
+	private Game newSinglePlayerGame(String username) {
+		Game game = new Game(true);
+		game.setHostPlayer(findOrCreateUser(username));
+		return game;
+	}
+
+	private Game newMultiPlayerGame(String username) {
+		Game game = new Game(false);
+		game.setHostPlayer(findOrCreateUser(username));
+		return game;
 	}
 
 	private boolean isPlayingAgainstMyself(String username, Game game) {
@@ -139,18 +156,11 @@ public class GameService {
 			throw new IllegalArgumentException("Username can not be null.");
 		}
 	}
-	
+
 	private void gameKeySanityCheck(String gameKey) {
 		if (StringUtils.isEmpty(gameKey)) {
 			throw new IllegalArgumentException("GameKey can not be null.");
 		}
-	}
-
-	private Game newSinglePlayerGame(String username) {
-		Game game = new Game();
-		game.setHostPlayer(findOrCreateUser(username));
-		game.setSinglePlayer(true);
-		return game;
 	}
 
 	private User findOrCreateUser(String username) {
