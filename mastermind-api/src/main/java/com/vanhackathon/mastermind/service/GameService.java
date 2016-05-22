@@ -72,8 +72,22 @@ public class GameService {
 		}
 
 	}
+	
+	private GameDTO transformIntoGameDTO(Game game, String externalUser) {
+		GameDTO gameDTO = transformIntoGameDTOBase(game);
+		gameDTO.setCompleteGuesses(getGameGuessesOfUser(game, externalUser));
+
+		return gameDTO;
+	}
 
 	private GameDTO transformIntoGameDTO(Game game) {
+		GameDTO gameDTO = transformIntoGameDTOBase(game);
+		gameDTO.setCompleteGuesses(getGameGuesses(game));
+
+		return gameDTO;
+	}
+	
+	private GameDTO transformIntoGameDTOBase(Game game) {
 		GameDTO gameDTO = new GameDTO();
 		gameDTO.setGameKey(game.getGameKey());
 		gameDTO.setHostPlayer(game.getHostPlayer());
@@ -82,7 +96,6 @@ public class GameService {
 		gameDTO.setSolved(game.getStatus().equals(GameStatus.SOLVED));
 		gameDTO.setStatus(game.getStatus().toString());
 		gameDTO.setTotalGuesses(game.getTotalGuesses());
-		gameDTO.setCompleteGuesses(getGameGuesses(game));
 
 		if (gameDTO.isSolved()) {
 			List<Guess> guesses = game.getGuesses();
@@ -103,6 +116,15 @@ public class GameService {
 		}
 
 		return game.getGuesses().stream().filter(g -> !g.getPlayer().equals(game.getNextTurn().getUsername()))
+				.collect(Collectors.toList());
+	}
+	
+	private List<Guess> getGameGuessesOfUser(Game game, String externalUser) {
+		if (game.isCompleted() || game.isSinglePlayer()) {
+			return game.getGuesses();
+		}
+
+		return game.getGuesses().stream().filter(g -> g.getPlayer().equals(externalUser))
 				.collect(Collectors.toList());
 	}
 
@@ -127,12 +149,16 @@ public class GameService {
 		return transformIntoGameDTO(game);
 	}
 
-	public GameDTO showGameStatus(String gameKey) {
+	public GameDTO showGameStatus(String gameKey, String externalUser) {
+		newGameSanityCheck(externalUser);
 		gameKeySanityCheck(gameKey);
 
 		Game game = games.findByGameKey(gameKey);
 
-		return transformIntoGameDTO(game);
+		// If its not solved yet, show only guesses from externalUser.
+		GameDTO gameDTO = transformIntoGameDTO(game, externalUser);
+
+		return gameDTO;
 	}
 
 	private Game newSinglePlayerGame(String username) {

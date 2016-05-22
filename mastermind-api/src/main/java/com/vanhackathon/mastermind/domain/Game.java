@@ -45,6 +45,7 @@ public class Game {
 	public Game(@JsonProperty("isSinglePlayer") boolean isSinglePlayer) {
 		this.secret = this.generateSecretCode();
 		this.status = isSinglePlayer ? GameStatus.READY : GameStatus.WAITING;
+		this.isSinglePlayer = isSinglePlayer;
 	}
 
 	private String generateSecretCode() {
