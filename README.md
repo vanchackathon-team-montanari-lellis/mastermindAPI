@@ -15,9 +15,9 @@ Swagger 2.0
 2. Type `mvn spring-boot:run` from the root project directory to start the application;
 3. Check the Swagger API: [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
 4. When creating a new game, decide whether you want to play single or multi player;
-5. Copy the generated game key and then make you guess using the guess API;
-6. You can check a game status (or any other game) using showGameStatus API;
-7. You can check all possible colors using getAllColors API.
+5. Copy the generated game key and then make your guess using the guess endpoint;
+6. You can check the game status (or any other game) using showGameStatus endpoint;
+7. You can check all possible colors using getAllColors endpoint.
 
 ## URLs
 To see all the endpoints created, please check it trough Swagger documentation:
