@@ -9,10 +9,12 @@ import org.springframework.util.StringUtils;
 
 import com.vanhackathon.mastermind.api.dto.GameDTO;
 import com.vanhackathon.mastermind.api.dto.GuessDTO;
+import com.vanhackathon.mastermind.domain.Colors;
 import com.vanhackathon.mastermind.domain.Game;
 import com.vanhackathon.mastermind.domain.GameStatus;
 import com.vanhackathon.mastermind.domain.Guess;
 import com.vanhackathon.mastermind.domain.User;
+import com.vanhackathon.mastermind.exception.InvalidColorException;
 import com.vanhackathon.mastermind.exception.UserNotFoundException;
 import com.vanhackathon.mastermind.repository.GameRepository;
 import com.vanhackathon.mastermind.repository.UsersRepository;
@@ -60,6 +62,15 @@ public class GameService {
 		// if (guess.getColors().length() != 8) {
 		// throw new IllegalArgumentException("Colors length must be 8.");
 		// }
+		
+		char[] colors = guess.getColors().toCharArray();
+		for (char c : colors) {
+			Colors color = Colors.getColorByChar(c);
+			if (color == null) {
+				throw new InvalidColorException(String.format("Color [%s] invalid.", c));
+			}
+		}
+		
 	}
 
 	private GameDTO transformIntoGameDTO(Game game) {
@@ -72,6 +83,16 @@ public class GameService {
 		gameDTO.setStatus(game.getStatus().toString());
 		gameDTO.setTotalGuesses(game.getTotalGuesses());
 		gameDTO.setCompleteGuesses(getGameGuesses(game));
+		
+		if (gameDTO.isSolved()) {
+			List<Guess> guesses = game.getGuesses();
+			for (Guess guess : guesses) {
+				if (guess.getStatus().equals(GameStatus.SOLVED)) {
+					gameDTO.setWinner(guess.getPlayer());
+				}
+			}
+		}
+		
 		return gameDTO;
 	}
 
@@ -105,6 +126,14 @@ public class GameService {
 		game = games.save(game);
 		return transformIntoGameDTO(game);
 	}
+	
+	public GameDTO showGameStatus(String gameKey) {
+		gameKeySanityCheck(gameKey);
+
+		Game game = games.findByGameKey(gameKey);
+
+		return transformIntoGameDTO(game);
+	}
 
 	private Game newSinglePlayerGame(String username) {
 		Game game = new Game(true);
@@ -125,6 +154,12 @@ public class GameService {
 	private void newGameSanityCheck(String username) {
 		if (StringUtils.isEmpty(username)) {
 			throw new IllegalArgumentException("Username can not be null.");
+		}
+	}
+	
+	private void gameKeySanityCheck(String gameKey) {
+		if (StringUtils.isEmpty(gameKey)) {
+			throw new IllegalArgumentException("GameKey can not be null.");
 		}
 	}
 
