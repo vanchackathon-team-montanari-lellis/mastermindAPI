@@ -1,4 +1,4 @@
-package com.vanhackathon.mastermind.dto;
+package com.vanhackathon.mastermind.domain;
 
 import java.math.BigInteger;
 

@@ -3,115 +3,139 @@ package com.vanhackathon.mastermind.domain;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.UUID;
 import java.util.stream.Collectors;
+
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
  * 
  * 
  * 
  */
+@Document(collection = "games")
 public class Game {
 
-    private static final int TIME_WINDOW = 30 * 60 * 1000;
-    private static final String COLORS = "RBGYPOCM";
+	private static final int TIME_WINDOW = 30 * 60 * 1000;
+	private static final String COLORS = Colors.getColorValues();
 
-    private String id = UUID.randomUUID().toString();
-    private long startTime = System.currentTimeMillis();
-    private int totalGuesses;
-    private GameStatus status = GameStatus.PLAYING;
+	@Id
+	private String gameKey;
+	private long startTime = System.currentTimeMillis();
+	private int totalGuesses;
+	private GameStatus status = GameStatus.PLAYING;
 
-    private List<Guess> guesses = new ArrayList<>();
+	private List<Guess> guesses = new ArrayList<>();
 
-    private String secret;
+	private String secret;
+	private User hostUser;
+	private boolean singlePlayer;
+	
+	public boolean isSinglePlayer() {
+		return singlePlayer;
+	}
 
-    public Game() {
-        this.secret = this.generateSecretCode();
-    }
+	public void setSinglePlayer(boolean singlePlayer) {
+		this.singlePlayer = singlePlayer;
+	}
 
-    private String generateSecretCode() {
-        Random random = new Random();
-        String code = COLORS;
-        return code
-                .chars()
-                .mapToObj(c -> String.valueOf(code.charAt(random.nextInt(code.length()))))
-                .collect(Collectors.joining());
-    }
+	public Game() {
+		this.secret = this.generateSecretCode();
+	}
 
-    public Game guess(String answer) {
-        checkTimeLimit();
-        if (isCompleted()) {
-            return this;
-        }
+	private String generateSecretCode() {
+		Random random = new Random();
+		String code = COLORS;
+		return code.chars().mapToObj(c -> String.valueOf(code.charAt(random.nextInt(code.length()))))
+				.collect(Collectors.joining());
+	}
 
-        Guess guess = new Guess(answer);
-        if (guess.solve(secret)) {
-            gameSolved();
-        }
+	public Game guess(String answer) {
+		checkTimeLimit();
+		if (isCompleted()) {
+			return this;
+		}
 
-        continuePlaying(guess);
-        return this;
-    }
+		Guess guess = new Guess(answer);
+		if (guess.solve(secret)) {
+			gameSolved();
+		}
 
-    private void checkTimeLimit() {
-        if (isCompleted()) {
-            return;
-        }
+		continuePlaying(guess);
+		return this;
+	}
 
-        if (System.currentTimeMillis() - TIME_WINDOW > startTime) {
-            this.status = GameStatus.TIME_IS_OVER;
-        }
-    }
+	private void checkTimeLimit() {
+		if (isCompleted()) {
+			return;
+		}
 
-    private void continuePlaying(Guess guess) {
-        incrementGuesses();
-        addGuess(guess);
-    }
+		if (System.currentTimeMillis() - TIME_WINDOW > startTime) {
+			this.status = GameStatus.TIME_IS_OVER;
+		}
+	}
 
-    private void gameSolved() {
-        this.status = GameStatus.SOLVED;
-    }
+	private void continuePlaying(Guess guess) {
+		incrementGuesses();
+		addGuess(guess);
+	}
 
-    private void incrementGuesses() {
-        totalGuesses++;
-    }
+	private void gameSolved() {
+		this.status = GameStatus.SOLVED;
+	}
 
-    private boolean isCompleted() {
-        return GameStatus.SOLVED.equals(status) || GameStatus.TIME_IS_OVER.equals(status);
-    }
+	private void incrementGuesses() {
+		totalGuesses++;
+	}
 
-    private void addGuess(Guess guess) {
-        guesses.add(guess);
-    }
+	private boolean isCompleted() {
+		return GameStatus.SOLVED.equals(status) || GameStatus.TIME_IS_OVER.equals(status);
+	}
 
-    public String getId() {
-        return id;
-    }
+	private void addGuess(Guess guess) {
+		guesses.add(guess);
+	}
 
-    public long getStartTime() {
-        return startTime;
-    }
+	public long getStartTime() {
+		return startTime;
+	}
 
-    public int getTotalGuesses() {
-        return totalGuesses;
-    }
+	public int getTotalGuesses() {
+		return totalGuesses;
+	}
 
-    public GameStatus getStatus() {
-        return status;
-    }
+	public GameStatus getStatus() {
+		return status;
+	}
 
-    public List<Guess> getGuesses() {
-        return guesses;
-    }
+	public List<Guess> getGuesses() {
+		return guesses;
+	}
 
-    public String getSecret() {
-        return secret;
-    }
+	public String getSecret() {
+		return secret;
+	}
 
-    @Override
-    public String toString() {
-        return "Game [id=" + id + ", startTime=" + startTime + ", totalGuesses=" + totalGuesses + ", status=" + status
-                + ", guesses=" + guesses + ", secret=" + secret + "]";
-    }
+	public String getGameKey() {
+		return gameKey;
+	}
+
+	public void setGameKey(String gameKey) {
+		this.gameKey = gameKey;
+	}
+
+	public User getHostUser() {
+		return hostUser;
+	}
+
+	public void setHostUser(User hostUser) {
+		this.hostUser = hostUser;
+	}
+
+	@Override
+	public String toString() {
+		return "Game [gameKey=" + gameKey + ", startTime=" + startTime + ", totalGuesses=" + totalGuesses + ", status="
+				+ status + ", guesses=" + guesses + ", secret=" + secret + "]";
+	}
 
 }

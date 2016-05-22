@@ -1,21 +1,13 @@
 package com.vanhackathon.mastermind.dto;
 
-import java.util.Date;
 import java.util.List;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+import com.vanhackathon.mastermind.domain.Colors;
+import com.vanhackathon.mastermind.domain.User;
 
-import com.wordnik.swagger.annotations.ApiModel;
+public class GameDTO {
 
-@ApiModel(value = "Game")
-@Document(collection = "games")
-public class Game {
-
-	@Id
 	private String gameKey;
-
-	private Date creationDate;
 
 	private List<Colors> secret;
 
@@ -51,13 +43,6 @@ public class Game {
 		return gameKey;
 	}
 
-	public Date getCreationDate() {
-		return creationDate;
-	}
-
-	public void setCreationDate(Date creationDate) {
-		this.creationDate = creationDate;
-	}
 
 	public void setGameKey(String gameKey) {
 		this.gameKey = gameKey;

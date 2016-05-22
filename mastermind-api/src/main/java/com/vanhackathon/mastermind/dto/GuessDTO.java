@@ -2,10 +2,7 @@ package com.vanhackathon.mastermind.dto;
 
 import java.util.List;
 
-import com.wordnik.swagger.annotations.ApiModel;
-
-@ApiModel(value = "Guess")
-public class Guess {
+public class GuessDTO {
 
 	private String usernameHost;
 

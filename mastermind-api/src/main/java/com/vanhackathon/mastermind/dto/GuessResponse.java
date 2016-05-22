@@ -1,6 +1,6 @@
 package com.vanhackathon.mastermind.dto;
 
-public class GuessFeedback {
+public class GuessResponse {
 
 	private boolean solved;
 
