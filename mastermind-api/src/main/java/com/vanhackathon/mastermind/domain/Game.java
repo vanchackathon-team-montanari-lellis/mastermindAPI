@@ -20,22 +20,15 @@ public class Game {
 	@Id
 	private String gameKey;
 	private long startTime = System.currentTimeMillis();
+	private String secret;
 	private int totalGuesses;
-	private GameStatus status = GameStatus.PLAYING;
+	private GameStatus status = GameStatus.WAITING;
 
 	private List<Guess> guesses = new ArrayList<>();
 
-	private String secret;
-	private User hostUser;
-	private boolean singlePlayer;
-	
-	public boolean isSinglePlayer() {
-		return singlePlayer;
-	}
-
-	public void setSinglePlayer(boolean singlePlayer) {
-		this.singlePlayer = singlePlayer;
-	}
+	private boolean singlePlayer = true;
+	private User hostPlayer;
+	private User secondPlayer;
 
 	public Game() {
 		this.secret = this.generateSecretCode();
@@ -50,6 +43,7 @@ public class Game {
 	}
 
 	public Game guess(String answer, String player) {
+		this.status = GameStatus.PLAYING;
 		checkTimeLimit();
 		if (isCompleted()) {
 			return this;
@@ -77,6 +71,12 @@ public class Game {
 	private void continuePlaying(Guess guess) {
 		incrementGuesses();
 		addGuess(guess);
+	}
+
+	public void play(User secondPlayer) {
+		setSinglePlayer(false);
+		setSecondPlayer(secondPlayer);
+		status = GameStatus.READY;
 	}
 
 	private void gameSolved() {
@@ -123,18 +123,35 @@ public class Game {
 		this.gameKey = gameKey;
 	}
 
-	public User getHostUser() {
-		return hostUser;
-	}
-
-	public void setHostUser(User hostUser) {
-		this.hostUser = hostUser;
-	}
-
 	@Override
 	public String toString() {
 		return "Game [gameKey=" + gameKey + ", startTime=" + startTime + ", totalGuesses=" + totalGuesses + ", status="
-				+ status + ", guesses=" + guesses + ", secret=" + secret + "]";
+				+ status + ", guesses=" + guesses + ", secret=" + secret + ", hostPlayer=" + hostPlayer
+				+ ", singlePlayer=" + singlePlayer + ", secondPlayer=" + secondPlayer + "]";
+	}
+
+	public boolean isSinglePlayer() {
+		return singlePlayer;
+	}
+
+	public void setSinglePlayer(boolean singlePlayer) {
+		this.singlePlayer = singlePlayer;
+	}
+
+	public void setSecondPlayer(User secondPlayer) {
+		this.secondPlayer = secondPlayer;
+	}
+
+	public User getSecondPlayer() {
+		return secondPlayer;
+	}
+
+	public User getHostPlayer() {
+		return hostPlayer;
+	}
+
+	public void setHostPlayer(User hostPlayer) {
+		this.hostPlayer = hostPlayer;
 	}
 
 }

@@ -1,24 +1,31 @@
 package com.vanhackathon.mastermind.api.dto;
 
+import java.util.List;
+
+import com.vanhackathon.mastermind.domain.Guess;
 import com.vanhackathon.mastermind.domain.User;
 
 public class GameDTO {
 
 	private String gameKey;
 
-	private User hostUser;
+	private User hostPlayer;
+	private User secondPlayer;
 
 	private boolean singlePlayer;
-
 	private boolean solved;
-	
-	private Integer totalGuesses;
-	
-	public Integer getTotalGuesses() {
+
+	private int totalGuesses;
+
+	private String status;
+
+	private List<Guess> completeGuesses;
+
+	public int getTotalGuesses() {
 		return totalGuesses;
 	}
-	
-	public void setTotalGuesses(Integer totalGuesses) {
+
+	public void setTotalGuesses(int totalGuesses) {
 		this.totalGuesses = totalGuesses;
 	}
 
@@ -38,12 +45,20 @@ public class GameDTO {
 		this.singlePlayer = singlePlayer;
 	}
 
-	public User getHostUser() {
-		return hostUser;
+	public User getHostPlayer() {
+		return hostPlayer;
 	}
 
-	public void setHostUser(User hostUser) {
-		this.hostUser = hostUser;
+	public void setHostPlayer(User hostPlayer) {
+		this.hostPlayer = hostPlayer;
+	}
+
+	public User getSecondPlayer() {
+		return secondPlayer;
+	}
+
+	public void setSecondPlayer(User secondPlayer) {
+		this.secondPlayer = secondPlayer;
 	}
 
 	public String getGameKey() {
@@ -52,6 +67,23 @@ public class GameDTO {
 
 	public void setGameKey(String gameKey) {
 		this.gameKey = gameKey;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setCompleteGuesses(List<Guess> guesses) {
+		this.completeGuesses = guesses;
+		
+	}
+
+	public List<Guess> getCompleteGuesses() {
+		return completeGuesses;
 	}
 
 }

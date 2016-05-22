@@ -21,6 +21,6 @@
 	<bean name="swagger2DocumentationConfiguration"
 		class="springfox.documentation.swagger2.configuration.Swagger2DocumentationConfiguration" />
 
-	<bean name="applicationSwaggerConfig" class="com.vanhackathon.conf.ApplicationSwaggerConfig" />
+	<bean name="applicationSwaggerConfig" class="com.vanhackathon.mastermind.configuration.ApplicationSwaggerConfig" />
 
 </beans>
