@@ -56,7 +56,7 @@ public class Game {
 				.collect(Collectors.joining());
 	}
 
-	public Game guess(String answer, String player) {
+	public Game guess(String answer, String player) throws NotYourTurnException {
 		playing(player);
 
 		checkTimeLimit();
@@ -73,7 +73,7 @@ public class Game {
 		return this;
 	}
 
-	private void playing(String player) {
+	private void playing(String player) throws NotYourTurnException {
 		this.status = GameStatus.READY.equals(status) ? GameStatus.PLAYING : status;
 
 		// turn set to first user
