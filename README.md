@@ -11,8 +11,8 @@
   Swagger 2.0
   
 ## Installing and testing
-  1. Install and run MongoDB using it's default port.
-  2. Type `mvn spring-boot:run` from the root project directory to start the application.
+  1. Type `mvn spring-boot:run` from the root project directory to start the application.
+  2. We stored our data in the cloud.
    
 ## URLs
   To see all the endpoints created, please check it trough Swagger documentation:
