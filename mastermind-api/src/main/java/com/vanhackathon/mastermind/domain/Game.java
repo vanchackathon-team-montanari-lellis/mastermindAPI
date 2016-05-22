@@ -9,9 +9,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
- * 
- * 
- * 
+ * Mastermind domain logic.
  */
 @Document(collection = "games")
 public class Game {
@@ -46,17 +44,18 @@ public class Game {
 	private String generateSecretCode() {
 		Random random = new Random();
 		String code = COLORS;
+		// randomly choose a color sequence. repeated colors are allowed.
 		return code.chars().mapToObj(c -> String.valueOf(code.charAt(random.nextInt(code.length()))))
 				.collect(Collectors.joining());
 	}
 
-	public Game guess(String answer) {
+	public Game guess(String answer, String player) {
 		checkTimeLimit();
 		if (isCompleted()) {
 			return this;
 		}
 
-		Guess guess = new Guess(answer);
+		Guess guess = new Guess(answer, player);
 		if (guess.solve(secret)) {
 			gameSolved();
 		}

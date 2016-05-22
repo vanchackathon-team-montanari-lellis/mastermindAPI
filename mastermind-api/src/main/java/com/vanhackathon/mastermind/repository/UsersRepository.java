@@ -1,24 +1,28 @@
-package com.vanhackathon.repository;
+package com.vanhackathon.mastermind.repository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Repository;
 
-import com.vanhackathon.exceptions.UserNotFoundException;
 import com.vanhackathon.mastermind.domain.User;
+import com.vanhackathon.mastermind.exception.UserNotFoundException;
 
 /**
  * Controls access data to Users.
  * 
  * @author lmontanari (lucas_montanari@hotmail.com)
  */
-@Service
+@Repository
 public class UsersRepository {
 
-	@Autowired
 	private MongoOperations mongoOperations;
+
+	@Autowired
+	public UsersRepository(MongoOperations mongoOperations) {
+		this.mongoOperations = mongoOperations;
+	}
 
 	public void save(User user) {
 		mongoOperations.save(user);
@@ -27,12 +31,7 @@ public class UsersRepository {
 	public boolean exists(User user) {
 		Query query = new Query(Criteria.where("username").is(user.getUsername()));
 		User dbUser = mongoOperations.findOne(query, User.class);
-
-		if (dbUser != null) {
-			return true;
-		}
-
-		return false;
+		return dbUser != null;
 	}
 
 	public User findByUsername(String username) throws UserNotFoundException {

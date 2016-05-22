@@ -1,14 +1,21 @@
 package com.vanhackathon.mastermind.domain;
 
+/**
+ * Each guess for each player.
+ * Describes player's answer, exact and near pens and whether the guess solved the game or not.
+ * 
+ */
 public class Guess {
     private String answer;
     private int exactPens;
     private int nearPens;
+    private String player;
 
     private GameStatus status = GameStatus.PLAYING;
 
-    public Guess(String answer) {
+    public Guess(String answer, String player) {
         this.answer = answer.toUpperCase();
+        this.player = player;
     }
 
     private int findExactPens(String secret) {
@@ -43,14 +50,12 @@ public class Guess {
             this.status = GameStatus.SOLVED;
             return true;
         }
-
         return false;
-
     }
 
     @Override
-    public String toString() {
-        return "Guess [answer=" + answer + ", exactPens=" + exactPens + ", nearPens=" + nearPens + ", status=" + status
-                + "]";
-    }
+	public String toString() {
+		return "Guess [answer=" + answer + ", exactPens=" + exactPens + ", nearPens=" + nearPens + ", player=" + player
+				+ ", status=" + status + "]";
+	}
 }

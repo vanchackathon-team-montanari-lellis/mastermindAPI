@@ -1,17 +1,18 @@
-package com.vanhackathon.repository;
+package com.vanhackathon.mastermind.repository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Repository;
 
 import com.vanhackathon.mastermind.domain.Game;
+import com.vanhackathon.mastermind.exception.GameNotFoundException;
 
 /**
  * Controls access data to Game.
  * 
  * @author lmontanari (lucas_montanari@hotmail.com)
  */
-@Service
+@Repository
 public class GameRepository {
 
 	@Autowired
@@ -24,7 +25,11 @@ public class GameRepository {
 	
 	public Game findByGameKey(String gameKey) {
 		Game game = mongoOperations.findById(gameKey, Game.class);
-		return game;
+		if (game != null) {
+			return game;
+		}
+		
+		throw new GameNotFoundException(String.format("Game key [%s] not found", gameKey));
 	}
 
 }
