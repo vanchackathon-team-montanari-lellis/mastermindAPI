@@ -1,4 +1,4 @@
-package com.vanhackathon.v1;
+package com.vanhackathon.mastermind.api.v1;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.vanhackathon.mastermind.domain.User;
-import com.vanhackathon.repository.UsersRepository;
+import com.vanhackathon.mastermind.repository.UsersRepository;
 
 /**
  * Rest services to manage users.

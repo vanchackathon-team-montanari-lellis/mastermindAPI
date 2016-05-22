@@ -9,9 +9,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
- * 
- * 
- * 
+ * Mastermind domain logic.
  */
 @Document(collection = "games")
 public class Game {
@@ -22,22 +20,15 @@ public class Game {
 	@Id
 	private String gameKey;
 	private long startTime = System.currentTimeMillis();
+	private String secret;
 	private int totalGuesses;
-	private GameStatus status = GameStatus.PLAYING;
+	private GameStatus status = GameStatus.WAITING;
 
 	private List<Guess> guesses = new ArrayList<>();
 
-	private String secret;
-	private User hostUser;
-	private boolean singlePlayer;
-	
-	public boolean isSinglePlayer() {
-		return singlePlayer;
-	}
-
-	public void setSinglePlayer(boolean singlePlayer) {
-		this.singlePlayer = singlePlayer;
-	}
+	private boolean singlePlayer = true;
+	private User hostPlayer;
+	private User secondPlayer;
 
 	public Game() {
 		this.secret = this.generateSecretCode();
@@ -46,17 +37,19 @@ public class Game {
 	private String generateSecretCode() {
 		Random random = new Random();
 		String code = COLORS;
+		// randomly choose a color sequence. repeated colors are allowed.
 		return code.chars().mapToObj(c -> String.valueOf(code.charAt(random.nextInt(code.length()))))
 				.collect(Collectors.joining());
 	}
 
-	public Game guess(String answer) {
+	public Game guess(String answer, String player) {
+		this.status = GameStatus.PLAYING;
 		checkTimeLimit();
 		if (isCompleted()) {
 			return this;
 		}
 
-		Guess guess = new Guess(answer);
+		Guess guess = new Guess(answer, player);
 		if (guess.solve(secret)) {
 			gameSolved();
 		}
@@ -78,6 +71,12 @@ public class Game {
 	private void continuePlaying(Guess guess) {
 		incrementGuesses();
 		addGuess(guess);
+	}
+
+	public void play(User secondPlayer) {
+		setSinglePlayer(false);
+		setSecondPlayer(secondPlayer);
+		status = GameStatus.READY;
 	}
 
 	private void gameSolved() {
@@ -124,18 +123,35 @@ public class Game {
 		this.gameKey = gameKey;
 	}
 
-	public User getHostUser() {
-		return hostUser;
-	}
-
-	public void setHostUser(User hostUser) {
-		this.hostUser = hostUser;
-	}
-
 	@Override
 	public String toString() {
 		return "Game [gameKey=" + gameKey + ", startTime=" + startTime + ", totalGuesses=" + totalGuesses + ", status="
-				+ status + ", guesses=" + guesses + ", secret=" + secret + "]";
+				+ status + ", guesses=" + guesses + ", secret=" + secret + ", hostPlayer=" + hostPlayer
+				+ ", singlePlayer=" + singlePlayer + ", secondPlayer=" + secondPlayer + "]";
+	}
+
+	public boolean isSinglePlayer() {
+		return singlePlayer;
+	}
+
+	public void setSinglePlayer(boolean singlePlayer) {
+		this.singlePlayer = singlePlayer;
+	}
+
+	public void setSecondPlayer(User secondPlayer) {
+		this.secondPlayer = secondPlayer;
+	}
+
+	public User getSecondPlayer() {
+		return secondPlayer;
+	}
+
+	public User getHostPlayer() {
+		return hostPlayer;
+	}
+
+	public void setHostPlayer(User hostPlayer) {
+		this.hostPlayer = hostPlayer;
 	}
 
 }
