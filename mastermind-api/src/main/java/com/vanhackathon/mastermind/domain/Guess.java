@@ -1,5 +1,10 @@
 package com.vanhackathon.mastermind.domain;
 
+/**
+ * Each guess for each player.
+ * Describe player's answer, exact and near pens and whether the guess solved the game or not.
+ * 
+ */
 public class Guess {
     private String answer;
     private int exactPens;
