@@ -20,6 +20,8 @@ public class GameDTO {
 	private String status;
 
 	private List<Guess> completeGuesses;
+	
+	private String winner;
 
 	public int getTotalGuesses() {
 		return totalGuesses;
@@ -84,6 +86,14 @@ public class GameDTO {
 
 	public List<Guess> getCompleteGuesses() {
 		return completeGuesses;
+	}
+	
+	public String getWinner() {
+		return winner;
+	}
+	
+	public void setWinner(String winner) {
+		this.winner = winner;
 	}
 
 }
