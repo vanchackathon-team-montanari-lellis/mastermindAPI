@@ -77,7 +77,7 @@ public class GameService {
 
 	// filter user guesses or return all guesses when the game is completed
 	private List<Guess> getGameGuesses(Game game) {
-		if (game.isCompleted()) {
+		if (game.isCompleted() || game.isSinglePlayer()) {
 			return game.getGuesses();
 		}
 
@@ -85,20 +85,37 @@ public class GameService {
 				.collect(Collectors.toList());
 	}
 
-	public GameDTO newGame(String username) {
+	public GameDTO newSinglePlayer(String username) {
+		Game game = newSinglePlayerGame(username);
+		games.save(game);
+		return transformIntoGameDTO(game);
+	}
+
+	public GameDTO newMultiPlayer(String username) {
 		newGameSanityCheck(username);
 
 		Game game = games.findOneWaiting();
 		if (game == null) {
-			game = newSinglePlayerGame(username);
+			game = newMultiPlayerGame(username);
 
 		} else if (!isPlayingAgainstMyself(username, game)) {
 			game.play(findOrCreateUser(username));
 		}
 
 		game = games.save(game);
-
 		return transformIntoGameDTO(game);
+	}
+
+	private Game newSinglePlayerGame(String username) {
+		Game game = new Game(true);
+		game.setHostPlayer(findOrCreateUser(username));
+		return game;
+	}
+
+	private Game newMultiPlayerGame(String username) {
+		Game game = new Game(false);
+		game.setHostPlayer(findOrCreateUser(username));
+		return game;
 	}
 
 	private boolean isPlayingAgainstMyself(String username, Game game) {
@@ -109,13 +126,6 @@ public class GameService {
 		if (StringUtils.isEmpty(username)) {
 			throw new IllegalArgumentException("Username can not be null.");
 		}
-	}
-
-	private Game newSinglePlayerGame(String username) {
-		Game game = new Game();
-		game.setHostPlayer(findOrCreateUser(username));
-		game.setSinglePlayer(true);
-		return game;
 	}
 
 	private User findOrCreateUser(String username) {

@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.vanhackathon.mastermind.api.dto.GameDTO;
 import com.vanhackathon.mastermind.api.dto.GuessDTO;
+import com.vanhackathon.mastermind.api.dto.NewGameDTO;
 import com.vanhackathon.mastermind.domain.Colors;
 import com.vanhackathon.mastermind.exception.GameNotFoundException;
 import com.vanhackathon.mastermind.exception.NotYourTurnException;
@@ -50,9 +51,15 @@ public class GameController {
 		return ResponseEntity.status(HttpStatus.OK).body(game);
 	}
 
-	@RequestMapping(value = "/createGame", method = RequestMethod.POST)
-	public ResponseEntity<GameDTO> createGame(@RequestBody(required = true) String username) {
-		GameDTO gameDTO = gameService.newGame(username);
+	@RequestMapping(value = "/game", method = RequestMethod.POST)
+	public ResponseEntity<GameDTO> createGame(@RequestBody NewGameDTO newGame) {
+		GameDTO gameDTO;
+		if (newGame.isSinglePlayer()) {
+			gameDTO = gameService.newSinglePlayer(newGame.getUsername());
+		} else {
+			gameDTO = gameService.newMultiPlayer(newGame.getUsername());
+		}
+
 		return ResponseEntity.status(HttpStatus.CREATED).body(gameDTO);
 	}
 

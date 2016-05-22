@@ -7,7 +7,7 @@ import com.vanhackathon.mastermind.domain.Game;
 public class MastermindMain {
 
     public static void main(String[] args) {
-        Game game = new Game();
+        Game game = new Game(true);
         System.out.println("DO NOT CHEAT! ;) ");
         System.out.println(game);
         

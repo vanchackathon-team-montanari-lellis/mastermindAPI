@@ -8,6 +8,8 @@ import java.util.stream.Collectors;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.vanhackathon.mastermind.exception.NotYourTurnException;
 
 /**
@@ -27,15 +29,22 @@ public class Game {
 
 	private List<Guess> guesses = new ArrayList<>();
 
-	private boolean singlePlayer = true;
+	private boolean isSinglePlayer = true;
 	private User hostPlayer;
 	private User secondPlayer;
 
 	private User nextTurn;
 
-	public Game() {
+	/**
+	 * Create a single or multi player game.
+	 * 
+	 * @param isSinglePlayer
+	 *            whether the game should be created as single or multi player.
+	 */
+	@JsonCreator
+	public Game(@JsonProperty("isSinglePlayer") boolean isSinglePlayer) {
 		this.secret = this.generateSecretCode();
-		this.status = GameStatus.WAITING;
+		this.status = isSinglePlayer ? GameStatus.READY : GameStatus.WAITING;
 	}
 
 	private String generateSecretCode() {
@@ -95,7 +104,6 @@ public class Game {
 	}
 
 	public void play(User secondPlayer) {
-		setSinglePlayer(false);
 		setSecondPlayer(secondPlayer);
 		status = GameStatus.READY;
 	}
@@ -147,16 +155,12 @@ public class Game {
 	@Override
 	public String toString() {
 		return "Game [gameKey=" + gameKey + ", startTime=" + startTime + ", secret=" + secret + ", totalGuesses="
-				+ totalGuesses + ", status=" + status + ", guesses=" + guesses + ", singlePlayer=" + singlePlayer
+				+ totalGuesses + ", status=" + status + ", guesses=" + guesses + ", isSinglePlayer=" + isSinglePlayer
 				+ ", hostPlayer=" + hostPlayer + ", secondPlayer=" + secondPlayer + ", nextTurn=" + nextTurn + "]";
 	}
 
 	public boolean isSinglePlayer() {
-		return singlePlayer;
-	}
-
-	public void setSinglePlayer(boolean singlePlayer) {
-		this.singlePlayer = singlePlayer;
+		return isSinglePlayer;
 	}
 
 	public void setSecondPlayer(User secondPlayer) {
