@@ -72,13 +72,8 @@ public class GameController {
 		return ResponseEntity.status(HttpStatus.OK).body(gameDTO);
 	}
 
-	@ExceptionHandler(IllegalArgumentException.class)
+	@ExceptionHandler({ IllegalArgumentException.class, InvalidColorException.class })
 	public void handleIllegalArguments(HttpServletResponse response, Exception e) throws IOException {
-		response.sendError(HttpStatus.BAD_REQUEST.value(), e.getMessage());
-	}
-
-	@ExceptionHandler(InvalidColorException.class)
-	public void handleInvalidColorException(HttpServletResponse response, Exception e) throws IOException {
 		response.sendError(HttpStatus.BAD_REQUEST.value(), e.getMessage());
 	}
 

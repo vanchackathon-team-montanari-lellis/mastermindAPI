@@ -62,7 +62,7 @@ public class GameService {
 		// if (guess.getColors().length() != 8) {
 		// throw new IllegalArgumentException("Colors length must be 8.");
 		// }
-		
+
 		char[] colors = guess.getColors().toCharArray();
 		for (char c : colors) {
 			Colors color = Colors.getColorByChar(c);
@@ -70,7 +70,7 @@ public class GameService {
 				throw new InvalidColorException(String.format("Color [%s] invalid.", c));
 			}
 		}
-		
+
 	}
 
 	private GameDTO transformIntoGameDTO(Game game) {
@@ -83,7 +83,7 @@ public class GameService {
 		gameDTO.setStatus(game.getStatus().toString());
 		gameDTO.setTotalGuesses(game.getTotalGuesses());
 		gameDTO.setCompleteGuesses(getGameGuesses(game));
-		
+
 		if (gameDTO.isSolved()) {
 			List<Guess> guesses = game.getGuesses();
 			for (Guess guess : guesses) {
@@ -92,7 +92,7 @@ public class GameService {
 				}
 			}
 		}
-		
+
 		return gameDTO;
 	}
 
@@ -126,7 +126,7 @@ public class GameService {
 		game = games.save(game);
 		return transformIntoGameDTO(game);
 	}
-	
+
 	public GameDTO showGameStatus(String gameKey) {
 		gameKeySanityCheck(gameKey);
 
@@ -156,7 +156,7 @@ public class GameService {
 			throw new IllegalArgumentException("Username can not be null.");
 		}
 	}
-	
+
 	private void gameKeySanityCheck(String gameKey) {
 		if (StringUtils.isEmpty(gameKey)) {
 			throw new IllegalArgumentException("GameKey can not be null.");
