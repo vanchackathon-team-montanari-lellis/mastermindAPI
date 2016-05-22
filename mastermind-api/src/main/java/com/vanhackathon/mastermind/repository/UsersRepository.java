@@ -24,8 +24,9 @@ public class UsersRepository {
 		this.mongoOperations = mongoOperations;
 	}
 
-	public void save(User user) {
+	public User save(User user) {
 		mongoOperations.save(user);
+		return user;
 	}
 
 	public boolean exists(User user) {
