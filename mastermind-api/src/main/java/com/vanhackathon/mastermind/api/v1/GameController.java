@@ -3,6 +3,7 @@ package com.vanhackathon.mastermind.api.v1;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -21,8 +22,10 @@ import com.vanhackathon.mastermind.api.dto.GuessDTO;
 import com.vanhackathon.mastermind.domain.Colors;
 import com.vanhackathon.mastermind.domain.Game;
 import com.vanhackathon.mastermind.domain.GameStatus;
+import com.vanhackathon.mastermind.domain.Guess;
 import com.vanhackathon.mastermind.domain.User;
 import com.vanhackathon.mastermind.exception.GameNotFoundException;
+import com.vanhackathon.mastermind.exception.NotYourTurnException;
 import com.vanhackathon.mastermind.exception.UserNotFoundException;
 import com.vanhackathon.mastermind.repository.GameRepository;
 import com.vanhackathon.mastermind.repository.UsersRepository;
@@ -73,8 +76,18 @@ public class GameController {
 		gameDTO.setSolved(game.getStatus().equals(GameStatus.SOLVED));
 		gameDTO.setStatus(game.getStatus().toString());
 		gameDTO.setTotalGuesses(game.getTotalGuesses());
-		gameDTO.setCompleteGuesses(game.getGuesses());
+		gameDTO.setCompleteGuesses(getGameGuesses(game));
 		return gameDTO;
+	}
+
+	// filter user guesses or return all guesses when the game is completed
+	private List<Guess> getGameGuesses(Game game) {
+		if (game.isCompleted()) {
+			return game.getGuesses();
+		}
+
+		return game.getGuesses().stream().filter(g -> !g.getPlayer().equals(game.getNextTurn().getUsername()))
+				.collect(Collectors.toList());
 	}
 
 	private void guessSanityCheck(GuessDTO guess) {
@@ -90,9 +103,9 @@ public class GameController {
 			throw new IllegalArgumentException("Colors can not be null.");
 		}
 
-//		if (guess.getColors().length() != 8) {
-//			throw new IllegalArgumentException("Colors length must be 8.");
-//		}
+		// if (guess.getColors().length() != 8) {
+		// throw new IllegalArgumentException("Colors length must be 8.");
+		// }
 	}
 
 	@RequestMapping(value = "/createGame", method = RequestMethod.POST)
@@ -102,9 +115,12 @@ public class GameController {
 		Game game = games.findOneWaiting();
 		if (game == null) {
 			game = newSinglePlayerGame(username);
-		} else {
+
+		} else if (!game.getHostPlayer().getUsername().equals(username)) {
 			game.play(findOrCreateUser(username));
+
 		}
+
 		game = games.save(game);
 
 		GameDTO gameDTO = transformIntoGameDTO(game);
@@ -124,10 +140,7 @@ public class GameController {
 
 		} catch (UserNotFoundException e) {
 			// If it doesn't exist, lets create one.
-			User user = new User();
-			user.setUsername(username);
-			users.save(user);
-			return user;
+			return users.save(new User(username));
 		}
 	}
 
@@ -137,8 +150,18 @@ public class GameController {
 		}
 	}
 
-	@ExceptionHandler({ IllegalArgumentException.class, GameNotFoundException.class })
+	@ExceptionHandler(IllegalArgumentException.class)
 	public void handleIllegalArguments(HttpServletResponse response, Exception e) throws IOException {
 		response.sendError(HttpStatus.BAD_REQUEST.value(), e.getMessage());
+	}
+
+	@ExceptionHandler(GameNotFoundException.class)
+	public void handleGameNotFound(HttpServletResponse response, Exception e) throws IOException {
+		response.sendError(HttpStatus.NOT_FOUND.value(), e.getMessage());
+	}
+	
+	@ExceptionHandler(NotYourTurnException.class)
+	public void handleNotYourTurn(HttpServletResponse response, Exception e) throws IOException {
+		response.sendError(HttpStatus.CONFLICT.value(), e.getMessage());
 	}
 }

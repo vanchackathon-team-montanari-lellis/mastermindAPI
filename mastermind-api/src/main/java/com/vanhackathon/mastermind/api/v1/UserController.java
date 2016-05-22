@@ -25,16 +25,9 @@ public class UserController {
 
 	@RequestMapping(value = "/user", method = RequestMethod.POST)
 	public ResponseEntity<Void> create(@RequestBody User user) {
-
-		// Let it be created by Mongo.
-		user.setId(null);
-
-		boolean userAlreadyExists = userService.exists(user);
-
-		if (!userAlreadyExists) {
+		if (!userService.exists(user)) {
 			userService.save(user);
 		}
-
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
 }

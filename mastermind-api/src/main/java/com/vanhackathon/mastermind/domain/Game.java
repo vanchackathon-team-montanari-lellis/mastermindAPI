@@ -8,6 +8,8 @@ import java.util.stream.Collectors;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import com.vanhackathon.mastermind.exception.NotYourTurnException;
+
 /**
  * Mastermind domain logic.
  */
@@ -22,7 +24,7 @@ public class Game {
 	private long startTime = System.currentTimeMillis();
 	private String secret;
 	private int totalGuesses;
-	private GameStatus status = GameStatus.WAITING;
+	private GameStatus status;
 
 	private List<Guess> guesses = new ArrayList<>();
 
@@ -30,8 +32,11 @@ public class Game {
 	private User hostPlayer;
 	private User secondPlayer;
 
+	private User nextTurn;
+
 	public Game() {
 		this.secret = this.generateSecretCode();
+		this.status = GameStatus.WAITING;
 	}
 
 	private String generateSecretCode() {
@@ -43,7 +48,8 @@ public class Game {
 	}
 
 	public Game guess(String answer, String player) {
-		this.status = GameStatus.PLAYING;
+		playing(player);
+
 		checkTimeLimit();
 		if (isCompleted()) {
 			return this;
@@ -58,6 +64,20 @@ public class Game {
 		return this;
 	}
 
+	private void playing(String player) {
+		this.status = GameStatus.READY.equals(status) ? GameStatus.PLAYING : status;
+
+		// turn set to first user
+		if (nextTurn == null) {
+			nextTurn = new User(player);
+		} else if (!nextTurn.equals(new User(player))) {
+			throw new NotYourTurnException("It is not your turn! Please wait.");
+			
+		}
+
+		
+	}
+
 	private void checkTimeLimit() {
 		if (isCompleted()) {
 			return;
@@ -69,8 +89,13 @@ public class Game {
 	}
 
 	private void continuePlaying(Guess guess) {
+		nextTurn();
 		incrementGuesses();
 		addGuess(guess);
+	}
+
+	private void nextTurn() {
+		nextTurn = nextTurn.equals(hostPlayer) ? secondPlayer : hostPlayer;
 	}
 
 	public void play(User secondPlayer) {
@@ -87,7 +112,7 @@ public class Game {
 		totalGuesses++;
 	}
 
-	private boolean isCompleted() {
+	public boolean isCompleted() {
 		return GameStatus.SOLVED.equals(status) || GameStatus.TIME_IS_OVER.equals(status);
 	}
 
@@ -125,9 +150,9 @@ public class Game {
 
 	@Override
 	public String toString() {
-		return "Game [gameKey=" + gameKey + ", startTime=" + startTime + ", totalGuesses=" + totalGuesses + ", status="
-				+ status + ", guesses=" + guesses + ", secret=" + secret + ", hostPlayer=" + hostPlayer
-				+ ", singlePlayer=" + singlePlayer + ", secondPlayer=" + secondPlayer + "]";
+		return "Game [gameKey=" + gameKey + ", startTime=" + startTime + ", secret=" + secret + ", totalGuesses="
+				+ totalGuesses + ", status=" + status + ", guesses=" + guesses + ", singlePlayer=" + singlePlayer
+				+ ", hostPlayer=" + hostPlayer + ", secondPlayer=" + secondPlayer + ", nextTurn=" + nextTurn + "]";
 	}
 
 	public boolean isSinglePlayer() {
@@ -152,6 +177,10 @@ public class Game {
 
 	public void setHostPlayer(User hostPlayer) {
 		this.hostPlayer = hostPlayer;
+	}
+
+	public User getNextTurn() {
+		return nextTurn;
 	}
 
 }
