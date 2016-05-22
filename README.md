@@ -2,10 +2,13 @@
 # Mastermind API
 
 ## Technologies used
-  Spring boot 1.3.5.RELEASE
-  Maven 3.3.3
-  MongoDB 3.2
-  Swagger 2.0
+Spring boot 1.3.5.RELEASE
+
+Maven 3.3.3
+
+MongoDB 3.2
+
+Swagger 2.0
   
 ## Installing and testing
 1. We stored our data in the cloud. There is no need to install a local database;
